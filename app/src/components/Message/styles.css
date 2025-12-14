@@ -1,0 +1,25 @@
+    .message {
+        padding: 48px 24px;
+        text-align: center;
+        background-color: #f9fafb;
+        border-radius: 8px;
+    }
+
+    .emoji {
+        font-size: 64px;
+        margin: 0 auto 16px;
+        color: #9ca3af;
+    }
+
+    .title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #374151;
+        margin: 0 0 8px;
+    }
+
+    .description {
+        font-size: 14px;
+        color: #6b7280;
+        margin: 0;
+    }

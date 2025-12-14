@@ -1,0 +1,22 @@
+.item {
+    width: 100%;
+    outline: none;
+    border: none;
+    transition: all color .2s, box-shadow .2s;
+    cursor: pointer;
+    padding: 12px 16px;
+
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.item:hover {
+    background-color: lightgray;
+    border-radius: 8px;
+}
+
+.image {
+    height: auto;
+    width: 16px;
+}

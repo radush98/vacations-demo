@@ -1,0 +1,28 @@
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+
+.input-wrapper:focus-within{
+    border-color: #3b82f6;
+}
+
+.input {
+    width: 100%;
+    font-size: 16px;
+    line-height: 1.5;
+    outline: none;
+    border: none;
+    transition: border-color .2s, box-shadow .2s;
+    flex-grow: 1;
+}
+
+.input-controls {
+    display: flex;
+    gap: 8px;
+}
