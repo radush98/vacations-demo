@@ -1,16 +1,18 @@
 import './styles.css'
 
-interface DropDownComposition {
-    Body: React.FC<{ children: React.ReactNode }>;
-    Trigger: React.FC<{ children: React.ReactNode }>;
-}
-
-interface DropDownProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CommonProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode;
 }
 
-interface DropDownBodyProps extends DropDownProps{};
-interface DropDownTriggerProps extends DropDownProps{};
+interface DropDownProps extends CommonProps { }
+
+interface DropDownBodyProps extends CommonProps{};
+interface DropDownTriggerProps extends CommonProps{};
+
+interface DropDownComposition {
+    Body: React.FC<DropDownBodyProps>;
+    Trigger: React.FC<DropDownTriggerProps>;
+}
 
 
 export const DropDown: React.FC<DropDownProps> & DropDownComposition = ({ children, ...props }) => {

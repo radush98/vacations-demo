@@ -8,8 +8,8 @@ import { Item } from "../components/Item/Item"
 import { Message } from "../components/Message/Message"
 import { ERROR_CODES } from "../data"
 import { getIcon } from "../utils"
-import { useGeoSearch, useOutsideClick } from "../hooks"
-import { useRef, useState } from "react"
+import { useGeoSearch, useOutsideClick, useTours } from "../hooks"
+import { useMemo, useRef, useState } from "react"
 import type { GeoEntity } from "../interfaces"
 
 export const FormPage = () => {
@@ -30,6 +30,14 @@ export const FormPage = () => {
         isCountry
     } = useGeoSearch();
 
+    const {
+        errorCode: toursErrorCode,
+        searchTours,
+        tours,
+        isLoading: isLoadingTours,
+        isLoadingPrices,
+    } = useTours();
+
     const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
         e.stopPropagation();
         setIsDropdownOpen(true);
@@ -40,11 +48,17 @@ export const FormPage = () => {
         }
     }
 
-    const onItemPick = (entity: GeoEntity) => {
+    const onItemPick = async (entity: GeoEntity) => {
         setValue(entity.name);
         setIsDropdownOpen(false);
         setIsCountry(entity.type === 'country');
+
+        if (entity.type === 'country') {
+            await searchTours(entity.id.toString());
+        }
     }
+
+    const isDisabled = useMemo(() => !value || errorCode !== null || isLoadingTours || isLoadingPrices, [value, errorCode, isLoadingTours, isLoadingPrices]);
 
     const onSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
@@ -115,7 +129,36 @@ export const FormPage = () => {
                     null
             }
 
-            <Button type="submit" disabled={!value || errorCode !== null}>Знайти</Button>
+            {
+                toursErrorCode ?
+                    <Message
+                        title={ERROR_CODES[toursErrorCode].title}
+                        description={ERROR_CODES[toursErrorCode].description}
+                        emoji="☹" /> :
+                    null
+            }
+
+            {
+                (isLoadingTours || isLoadingPrices) &&
+                <Message
+                    title="Завантаження..."
+                    description="Шукаємо тури, будь ласка зачекайте"
+                    emoji="⏳" />
+            }
+
+            {
+                tours && Object.keys(tours.prices).length > 0 &&
+                <div className="tours-results">
+                    <h3>Знайдено турів: {Object.keys(tours.prices).length}</h3>
+                </div>
+            }
+
+            <Button
+                type="submit"
+                disabled={isDisabled}
+            >
+                Знайти
+            </Button>
         </form>
     </>
 }

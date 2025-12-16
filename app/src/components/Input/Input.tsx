@@ -1,14 +1,20 @@
 import React from 'react';
 import './styles.css';
 
-interface InputComposition {
-  Field: React.FC<React.InputHTMLAttributes<HTMLInputElement>>;
-  Controls: React.FC<{ children: React.ReactNode }>;
-}
-
-interface InputContainerProps extends React.HTMLAttributes<HTMLDivElement>{
+interface CommonProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
 }
+
+interface InputContainerProps extends CommonProps { }
+
+interface FieldProps extends React.InputHTMLAttributes<HTMLInputElement> { }
+interface ControlsProps extends CommonProps { }
+
+interface InputComposition {
+  Field: React.FC<FieldProps>;
+  Controls: React.FC<ControlsProps>;
+}
+
 
 export const Input: React.FC<InputContainerProps> & InputComposition = ({ children }) => {
   return (
@@ -18,7 +24,7 @@ export const Input: React.FC<InputContainerProps> & InputComposition = ({ childr
   );
 };
 
-const Field: React.FC<React.InputHTMLAttributes<HTMLInputElement>> = (props) => {
+const Field: React.FC<FieldProps> = (props) => {
   return <input type="text" className="input" {...props} />;
 };
 
