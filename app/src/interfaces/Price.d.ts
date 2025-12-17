@@ -1,3 +1,5 @@
+import type { Hotel } from './Geo';
+
 export type PriceOffer = {
     id: string;
     amount: number;
@@ -23,6 +25,12 @@ export type ErrorResponse = {
     error: true;
     message: string;
     waitUntil?: string;
+};
+
+export type TourCard = {
+    hotel: Hotel;
+    price: PriceOffer;
+    countryFlag: string;
 };
 
 

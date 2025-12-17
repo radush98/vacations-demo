@@ -1,7 +1,7 @@
 export type GeoEntityType = 'country' | 'city' | 'hotel';
 
 export type Country = { id: string; name: string; flag: string };
-export type City = { id: number; name: string };
+export type City = { id: number; name: string; countryId: string };
 export type Hotel = {
     id: number;
     name: string;
@@ -10,6 +10,19 @@ export type Hotel = {
     cityName: string;
     countryId: string;
     countryName: string;
+};
+
+export type HotelServices = {
+    wifi: string;
+    aquapark: string;
+    tennis_court: string;
+    laundry: string;
+    parking: string;
+};
+
+export type HotelDetail = Hotel & {
+    description: string;
+    services: HotelServices;
 };
 
 export type GeoCountry = Country & { type: "country" };

@@ -1,16 +1,17 @@
 import { faChevronDown, faXmark } from "@fortawesome/free-solid-svg-icons"
-import { Button } from "../components/Button/Button"
-import { Input } from "../components/Input/Input"
+import { Button } from "../../components/Button/Button"
+import { Input } from "../../components/Input/Input"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { DropDown } from "../components/DropDown/DropDown"
+import { DropDown } from "../../components/DropDown/DropDown"
 import './styles.css';
-import { Item } from "../components/Item/Item"
-import { Message } from "../components/Message/Message"
-import { ERROR_CODES } from "../data"
-import { getIcon } from "../utils"
-import { useGeoSearch, useOutsideClick, useTours } from "../hooks"
-import { useMemo, useRef, useState } from "react"
-import type { GeoEntity } from "../interfaces"
+import { Item } from "../../components/Item/Item"
+import { Message } from "../../components/Message/Message"
+import { Card } from "../../components/Card/Card"
+import { ERROR_CODES } from "../../data"
+import { getIcon } from "../../utils"
+import { useGeoSearch, useOutsideClick, useTours } from "../../hooks"
+import { useMemo, useRef, useState, useEffect } from "react"
+import type { GeoEntity } from "../../interfaces"
 
 export const FormPage = () => {
     const [isDropDownOpen, setIsDropdownOpen] = useState<boolean>(false);
@@ -26,8 +27,8 @@ export const FormPage = () => {
         data,
         isLoading,
         setValue,
-        setIsCountry,
-        isCountry
+        entity,
+        setEntity
     } = useGeoSearch();
 
     const {
@@ -35,7 +36,6 @@ export const FormPage = () => {
         searchTours,
         tours,
         isLoading: isLoadingTours,
-        isLoadingPrices,
     } = useTours();
 
     const onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
@@ -43,7 +43,7 @@ export const FormPage = () => {
         setIsDropdownOpen(true);
         if (!value) {
             getBasicResponse();
-        } else if (value && isCountry) {
+        } else if (value && entity?.type === 'country') {
             getBasicResponse();
         }
     }
@@ -51,21 +51,36 @@ export const FormPage = () => {
     const onItemPick = async (entity: GeoEntity) => {
         setValue(entity.name);
         setIsDropdownOpen(false);
-        setIsCountry(entity.type === 'country');
-
-        if (entity.type === 'country') {
-            await searchTours(entity.id.toString());
-        }
+        setEntity(entity);
     }
 
-    const isDisabled = useMemo(() => !value || errorCode !== null || isLoadingTours || isLoadingPrices, [value, errorCode, isLoadingTours, isLoadingPrices]);
+    const isDisabled = useMemo(() => !entity || !value || errorCode !== null || isLoadingTours, [value, errorCode, isLoadingTours, entity]);
 
     const onSubmit = (e?: React.FormEvent) => {
         if (e) e.preventDefault();
-        if (!value || errorCode !== null) return;
+        if (isDisabled || !entity) return;
 
-        console.log('Submitting...');
+        searchTours(entity);
     };
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && !isDisabled && entity) {
+                const target = event.target as HTMLElement;
+                if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+                    return;
+                }
+                event.preventDefault();
+                searchTours(entity);
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isDisabled, entity, searchTours]);
 
     const renderContent = () => {
         if (isLoading) return <div className="status-message">Завантаження...</div>;
@@ -120,6 +135,14 @@ export const FormPage = () => {
                 </DropDown.Body> : <></>}
             </DropDown>
 
+            <Button
+                type="submit"
+                disabled={isDisabled}
+            >
+                Знайти
+            </Button>
+        </form>
+        <div className="results">
             {
                 errorCode ?
                     <Message
@@ -139,26 +162,26 @@ export const FormPage = () => {
             }
 
             {
-                (isLoadingTours || isLoadingPrices) &&
+                isLoadingTours &&
                 <Message
                     title="Завантаження..."
                     description="Шукаємо тури, будь ласка зачекайте"
                     emoji="⏳" />
             }
-
             {
-                tours && Object.keys(tours.prices).length > 0 &&
+                tours && tours.length > 0 &&
                 <div className="tours-results">
-                    <h3>Знайдено турів: {Object.keys(tours.prices).length}</h3>
+                    <h3>Знайдено турів: {tours.length}</h3>
+                    <div className="tours-grid">
+                        {tours.map((tourCard) => (
+                            <Card 
+                                key={`${tourCard.hotel.id}-${tourCard.price.id}`}
+                                tourCard={tourCard}
+                            />
+                        ))}
+                    </div>
                 </div>
             }
-
-            <Button
-                type="submit"
-                disabled={isDisabled}
-            >
-                Знайти
-            </Button>
-        </form>
+        </div>
     </>
 }

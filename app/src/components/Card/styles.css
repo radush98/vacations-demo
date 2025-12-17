@@ -1,0 +1,89 @@
+.card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px #0000001a, 0 1px 2px #0000000f;
+    transition: box-shadow .2s, transform .2s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 16px;
+}
+
+.card-image-wrapper {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background-color: #f3f4f6;
+}
+
+.card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    flex: 1;
+    margin-top: 16px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.card-location {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-flag {
+    width: 20px;
+    height: 15px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.card-country, .card-city, .card-separator {
+    color: #6b7280;
+}
+
+.card-dates {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.card-date-label {
+    color: #6b7280;
+}
+
+.card-date-value {
+    color: #111827;
+    font-weight: 500;
+}
+
+.card-price {
+    font-size: 20px;
+    font-weight: 600;
+    color: #111827;
+}
+
+.card-link {
+    background-color: transparent;
+    padding: 0;
+    color: #3b82f6;
+    width: fit-content;
+}

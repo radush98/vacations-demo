@@ -1,3 +1,1 @@
-export * from './countries.service';
-export * from './geo.service';
-export * from './prices.service';
+export { apiService } from './api.service';
