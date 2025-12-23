@@ -1,0 +1,9 @@
+.input-control {
+    cursor: pointer;
+    transition: all 0.2s linear 0s;
+}
+
+.rotate {
+    transform: rotate(180deg);
+}
+

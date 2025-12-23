@@ -23,19 +23,6 @@
     text-align: center;
 }
 
-.status-message {
-    padding: 12px 16px;
-}
-
-.input-control {
-    cursor: pointer;
-    transition: all 0.2s linear 0s;
-}
-
-.rotate {
-    transform: rotate(180deg);
-}
-
 .results {
     width: 100%;
     margin-top: 16px;

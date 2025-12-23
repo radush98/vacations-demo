@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { apiService } from "../services";
 import type { GeoEntity } from "../interfaces";
 import type { ERROR_CODES } from "../data";
@@ -7,17 +7,6 @@ export const useGeoSearch = () => {
     const [data, setData] = useState<GeoEntity[] | null>(null)
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [errorCode, setErrorCode] = useState<keyof typeof ERROR_CODES | null>(null);
-    const [value, setValue] = useState<string>('');
-    const [entity, setEntityState] = useState<GeoEntity | null>(null);
-
-    const setEntity = useCallback((newEntity: GeoEntity | null) => {
-        setEntityState((prevEntity) => {
-            if (JSON.stringify(prevEntity) === JSON.stringify(newEntity)) {
-                return prevEntity;
-            }
-            return newEntity;
-        });
-    }, []);
 
     const searchGeo = useCallback(async (searchQuery: string) => {
         if (!searchQuery.trim()) return;
@@ -34,34 +23,7 @@ export const useGeoSearch = () => {
         }
     }, []);
 
-    useEffect(() => {
-        if (!value) return;
-
-        const timer = setTimeout(() => {
-            searchGeo(value);
-        }, 400);
-
-        return () => clearTimeout(timer);
-    }, [value, searchGeo]);
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(e.target.value);
-        if (e.target.value === '') {
-            getBasicResponse()
-        }
-        if (entity) {
-            setEntity(null)
-        }
-    };
-
-    const handleClear = () => {
-        setValue('');
-        setData(null);
-        setErrorCode(null);
-        getBasicResponse();
-    };
-
-    const getBasicResponse = async () => {
+    const getBasicResponse = useCallback(async () => {
         if (isLoading) return;
         if (data?.every(item => item.type === 'country')) return;
 
@@ -69,25 +31,26 @@ export const useGeoSearch = () => {
         setErrorCode(null);
 
         try {
-            const data = await apiService.getCountries();
-            setData(data);
+            const countries = await apiService.getCountries();
+            setData(countries);
         } catch (err) {
             setErrorCode('UNKNOWN');
         } finally {
             setIsLoading(false);
         }
-    }
+    }, [isLoading, data]);
+
+    const clearData = useCallback(() => {
+        setData(null);
+        setErrorCode(null);
+    }, []);
 
     return {
-        handleChange,
-        handleClear,
+        searchGeo,
         getBasicResponse,
+        clearData,
         errorCode,
-        value,
         data,
         isLoading,
-        setValue,
-        entity,
-        setEntity
     }
 }

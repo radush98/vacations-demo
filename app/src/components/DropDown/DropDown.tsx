@@ -1,43 +1,66 @@
-import './styles.css'
+import { createContext, useContext, useState, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { useOutsideClick } from '../../hooks';
+import './styles.css';
 
-interface CommonProps extends React.HTMLAttributes<HTMLDivElement> {
-    children: React.ReactNode;
-}
+const DropdownContext = createContext<{
+    isOpen: boolean;
+    toggle: () => void;
+    close: () => void;
+    open: () => void;
+} | null>(null);
 
-interface DropDownProps extends CommonProps { }
+export const useDropdown = () => {
+    const context = useContext(DropdownContext);
+    if (!context) throw new Error("Dropdown sub-components must be wrapped in <DropDown />");
+    return context;
+};
 
-interface DropDownBodyProps extends CommonProps{};
-interface DropDownTriggerProps extends CommonProps{};
+export const DropDown = ({ children }: { children: ReactNode }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
-interface DropDownComposition {
-    Body: React.FC<DropDownBodyProps>;
-    Trigger: React.FC<DropDownTriggerProps>;
-}
+    const toggle = () => setIsOpen(prev => !prev);
+    const close = () => setIsOpen(false);
+    const open = () => setIsOpen(true);
 
+    useOutsideClick(containerRef, close);
 
-export const DropDown: React.FC<DropDownProps> & DropDownComposition = ({ children, ...props }) => {
     return (
-        <div className="dropdown" {...props}>
-            {children}
-        </div>
+        <DropdownContext.Provider value={{ isOpen, open, toggle, close }}>
+            <div className="dropdown" ref={containerRef} style={{ position: 'relative' }}>
+                {children}
+            </div>
+        </DropdownContext.Provider>
     );
-}
+};
 
-const DropDownTrigger: React.FC<DropDownTriggerProps> = ({ children, ...props }) => {
+const DropDownTrigger = ({ children }: { children: ReactNode }) => {
+    const { isOpen, open } = useDropdown();
     return (
-        <div {...props}>
+        <div
+            className="dropdown-trigger"
+            onClick={() => !isOpen ? open() : null}
+        >
             {children}
         </div>
     );
 };
 
-const DropDownBody: React.FC<DropDownBodyProps> = ({ children, ...props }) => {
+const DropDownBody = ({ children }: { children: ReactNode }) => {
+    const { isOpen } = useDropdown();
+    if (!isOpen) return null;
+
     return (
-        <div className="dropdown-body" {...props}>
+        <div
+            role="menu"
+            className="dropdown-body"
+            style={{ position: 'absolute', top: '100%', left: 0 }}
+        >
             {children}
         </div>
     );
 };
 
-DropDown.Body = DropDownBody;
 DropDown.Trigger = DropDownTrigger;
+DropDown.Body = DropDownBody;
